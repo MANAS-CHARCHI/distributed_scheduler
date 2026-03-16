@@ -47,12 +47,13 @@ class SchedulerCreateRequest(BaseModel):
     max_retry: int = 3
 
 class SchedulerUpdateRequest(BaseModel):
+    id: int
     name: str | None
-    webhook: dict | None
-    callback: dict | None
+    webhook: WebHookRequest | None
+    callback: CallBackRequest | None
     payload: dict | None
-    execution_time: str | None
-    schedule_type: str | None
+    execution_time: datetime | None
+    schedule_type: ScheduleType | None
     repeat_on: list[int] | None
     active: bool | None
     max_retry: int | None

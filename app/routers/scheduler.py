@@ -7,20 +7,13 @@ from database.models import Scheduler, SchedulerWebhookData, SchedulerCallbackDa
 
 router = APIRouter(prefix="/scheduler", tags=["Scheduler"])
 
-@router.post("", response_model=schemas.SchedulerResponse,status_code=status.HTTP_201_CREATED)
+@router.post("/create", response_model=schemas.SchedulerResponse,status_code=status.HTTP_201_CREATED)
 def create_scheduler(request: schemas.SchedulerCreateRequest, db: Session = Depends(get_db)):
     """Create a scheduler task"""
     # insert into db
-    webhook: schemas.WebHookRequest = request.webhook
-    callback: schemas.CallBackRequest | None = request.callback
-    name: str | None = request.name
-    payload: dict = request.payload
-    execution_time: str = request.execution_time
     schedule_type: ScheduleType = request.schedule_type
     repeat_on: list[int] | None = request.repeat_on
-    active: bool = request.active
-    max_retry: int = request.max_retry
-
+    
     if schedule_type == ScheduleType.WEEKLY and (not repeat_on or any(day not in range(1,8) for day in repeat_on)):
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="For weekly schedule, repeat_on must be a list of integers between 1 and 7 representing days of the week (1 for Monday, 7 for Sunday).")
     if schedule_type == ScheduleType.MONTHLY and (not repeat_on or any(day not in range(1,32) for day in repeat_on)):
@@ -73,4 +66,52 @@ def create_scheduler(request: schemas.SchedulerCreateRequest, db: Session = Depe
     return {
         "id": scheduler.id,
         "message": "Scheduler created successfully"
+    }
+@router.post("/update", response_model=schemas.SchedulerResponse, status_code=status.HTTP_200_OK)
+def update_scheduler(request: schemas.SchedulerUpdateRequest, db: Session = Depends(get_db)):
+    scheduler = db.query(Scheduler).filter(Scheduler.id == request.id).first()
+    try:
+        if not scheduler:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Scheduler not found")
+        if request.webhook:
+                webhook_data = db.query(SchedulerWebhookData).filter(
+                    SchedulerWebhookData.id == scheduler.webhook_id
+                ).first()
+                if not webhook_data:
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Webhook not found")
+                for field, value in request.webhook.model_dump(exclude_unset=True).items():
+                    setattr(webhook_data, field, value)
+                    
+        if request.callback:
+                if scheduler.callback_id:
+                    callback_data = db.query(SchedulerCallbackData).filter(
+                        SchedulerCallbackData.id == scheduler.callback_id
+                    ).first()
+                    if not callback_data:
+                        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Callback not found")
+                    for field, value in request.callback.model_dump(exclude_unset=True).items():
+                        setattr(callback_data, field, value)
+                else:
+                    callback_data = SchedulerCallbackData(**request.callback.model_dump())
+                    db.add(callback_data)
+                    db.flush()
+                    scheduler.callback_id = callback_data.id
+        update_data = request.model_dump(exclude_unset=True, exclude={"webhook", "callback"})
+        for field, value in update_data.items():
+            setattr(scheduler, field, value)
+        db.commit()
+        db.refresh(scheduler)  
+                  
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update scheduler: {str(e)}"
+        )
+
+    return {
+        "id": scheduler.id,
+        "message": "Scheduler updated successfully"
     }
