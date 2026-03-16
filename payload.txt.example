@@ -1,0 +1,30 @@
+{
+  "name": "Daily Report Scheduler",
+  "webhook": {
+    "name": "Report Webhook",
+    "webhook_url": "https://api.example.com/trigger/report",
+    "webhook_headers": {
+      "Authorization": "Bearer your-token-here",
+      "Content-Type": "application/json"
+    },
+    "webhook_timeout_seconds": 90
+  },
+  "callback": {
+    "name": "Report Callback",
+    "callback_url": "https://api.example.com/callback/report",
+    "callback_headers": {
+      "Authorization": "Bearer your-token-here"
+    },
+    "callback_timeout_seconds": 60
+  },
+  "payload": {
+    "report_type": "sales",
+    "format": "pdf",
+    "recipients": ["admin@example.com"]
+  },
+  "execution_time": "2026-03-17T10:00:00Z",
+  "schedule_type": "weekly",
+  "repeat_on": [1, 3, 5],
+  "active": true,
+  "max_retry": 3
+}

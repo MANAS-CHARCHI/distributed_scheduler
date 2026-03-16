@@ -6,21 +6,7 @@ import uuid, enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from database.db import Base
-
-class ScheduleType(str, enum.Enum):
-    ONCE = "once"
-    DAILY = "daily"
-    WEEKLY = "weekly"
-    MONTHLY = "monthly"
-
-class DayOfWeek(int, enum.Enum):
-    MONDAY = 1
-    TUESDAY = 2
-    WEDNESDAY = 3
-    THURSDAY = 4
-    FRIDAY = 5
-    SATURDAY = 6
-    SUNDAY = 7
+from app.schemas.scheduleSchemas import ScheduleType, DayOfWeek
 
 class SchedulerWebhookData(Base):
     __tablename__ = "scheduler_webhook_data"
