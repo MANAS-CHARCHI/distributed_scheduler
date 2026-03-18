@@ -6,7 +6,7 @@ import uuid, enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from database.db import Base
-from app.schemas.scheduleSchemas import ScheduleType, DayOfWeek
+from app.schemas.scheduleSchemas import ScheduleType, DayOfWeek, SchedulerStatus
 
 class SchedulerWebhookData(Base):
     __tablename__ = "scheduler_webhook_data"
@@ -39,7 +39,7 @@ class Scheduler(Base):
     schedule_type = Column(Enum(ScheduleType, name="schedule_type_enum"), nullable=False, default=ScheduleType.ONCE)
     # -> weekly -> [1,3,5]  (Mon Wed Fri) or monthly -> [1,15]
     repeat_on = Column(ARRAY(Integer), nullable=True)
-    active = Column(Boolean, default=True)
+    active = Column(Enum(SchedulerStatus, name="scheduler_status_enum"), default=True)
     max_retry = Column(Integer, default=3)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     last_executed_at = Column(DateTime(timezone=True), nullable=True)
@@ -77,4 +77,3 @@ class ParentScheduler(Base):
     id = Column(Integer, primary_key=True)
     user_id=Column(UUID(as_uuid=True), nullable=True)
     scheduler_id=Column(Integer, ForeignKey("scheduler.id", ondelete="CASCADE"), nullable=False, index=True)
-    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))

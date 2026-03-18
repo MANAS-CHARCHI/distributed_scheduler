@@ -4,6 +4,11 @@ import enum
 
 from pydantic import BaseModel
 
+class SchedulerStatus(str, enum.Enum):
+    ACTIVE = "active"
+    FAILED = "failed"
+    COMPLETED = "completed"
+    
 class ScheduleType(str, enum.Enum):
     ONCE = "once"
     DAILY = "daily"
