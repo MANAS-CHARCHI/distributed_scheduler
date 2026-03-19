@@ -1,8 +1,8 @@
-"""initial tables
+"""fresh tables
 
-Revision ID: f8bfdd39f0f6
+Revision ID: ee4d36026ce4
 Revises: 
-Create Date: 2026-03-16 00:06:58.070842
+Create Date: 2026-03-19 10:32:40.497707
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision: str = 'f8bfdd39f0f6'
+revision: str = 'ee4d36026ce4'
 down_revision: Union[str, Sequence[str], None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -50,7 +50,7 @@ def upgrade() -> None:
     sa.Column('execution_time', sa.DateTime(timezone=True), nullable=True),
     sa.Column('schedule_type', sa.Enum('ONCE', 'DAILY', 'WEEKLY', 'MONTHLY', name='schedule_type_enum'), nullable=False),
     sa.Column('repeat_on', postgresql.ARRAY(sa.Integer()), nullable=True),
-    sa.Column('active', sa.Boolean(), nullable=True),
+    sa.Column('active', sa.Enum('ACTIVE', 'FAILED', 'COMPLETED', name='scheduler_status_enum'), nullable=True),
     sa.Column('max_retry', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.Column('last_executed_at', sa.DateTime(timezone=True), nullable=True),
@@ -66,7 +66,6 @@ def upgrade() -> None:
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.UUID(), nullable=True),
     sa.Column('scheduler_id', sa.Integer(), nullable=False),
-    sa.Column('created_at', sa.DateTime(timezone=True), nullable=True),
     sa.ForeignKeyConstraint(['scheduler_id'], ['scheduler.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )

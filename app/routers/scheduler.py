@@ -48,7 +48,7 @@ def create_scheduler(request: schemas.SchedulerCreateRequest, db: Session = Depe
             execution_time=request.execution_time,
             schedule_type=request.schedule_type,
             repeat_on=request.repeat_on,
-            active=request.active,
+            status=request.status,
             max_retry=request.max_retry,
         )
         db.add(scheduler)

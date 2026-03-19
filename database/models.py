@@ -39,7 +39,7 @@ class Scheduler(Base):
     schedule_type = Column(Enum(ScheduleType, name="schedule_type_enum"), nullable=False, default=ScheduleType.ONCE)
     # -> weekly -> [1,3,5]  (Mon Wed Fri) or monthly -> [1,15]
     repeat_on = Column(ARRAY(Integer), nullable=True)
-    active = Column(Enum(SchedulerStatus, name="scheduler_status_enum"), default=True)
+    status = Column(Enum(SchedulerStatus, name="scheduler_status_enum"), default=True)
     max_retry = Column(Integer, default=3)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
     last_executed_at = Column(DateTime(timezone=True), nullable=True)

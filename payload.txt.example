@@ -25,6 +25,6 @@
   "execution_time": "2026-03-17T10:00:00Z",
   "schedule_type": "weekly",
   "repeat_on": [1, 3, 5],
-  "active": true,
+  "status": "active",
   "max_retry": 3
 }

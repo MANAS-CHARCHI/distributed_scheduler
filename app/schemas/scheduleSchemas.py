@@ -48,7 +48,7 @@ class SchedulerCreateRequest(BaseModel):
     execution_time: datetime
     schedule_type: ScheduleType
     repeat_on: list[int] | None
-    active: bool = True
+    status: SchedulerStatus
     max_retry: int = 3
 
 class SchedulerUpdateRequest(BaseModel):
@@ -60,6 +60,6 @@ class SchedulerUpdateRequest(BaseModel):
     execution_time: datetime | None
     schedule_type: ScheduleType | None
     repeat_on: list[int] | None
-    active: bool | None
+    status: SchedulerStatus
     max_retry: int | None
     
